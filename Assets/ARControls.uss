@@ -1,0 +1,188 @@
+.ar-root {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}
+
+.sidebar-host {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 176px;
+    overflow: visible;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.sidebar-track {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 176px;
+    flex-direction: row;
+    align-items: center;
+    transition-property: translate;
+    transition-duration: 0.24s;
+    transition-timing-function: ease-out;
+}
+
+.sidebar-expanded {
+    translate: 0 0;
+}
+
+.sidebar-collapsed {
+    translate: -132px 0;
+}
+
+.sidebar-panel {
+    width: 132px;
+    height: 100%;
+
+    padding-top: 18px;
+    padding-right: 8px;
+    padding-bottom: 18px;
+    padding-left: 8px;
+
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+
+    background-color: rgba(16, 36, 34, 0.56);
+
+    border-top-width: 1px;
+    border-right-width: 0;
+    border-bottom-width: 1px;
+    border-left-width: 0;
+
+    border-top-color: rgba(220, 255, 170, 0.18);
+    border-bottom-color: rgba(220, 255, 170, 0.08);
+
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.sidebar-title {
+    font-size: 8px;
+    letter-spacing: 1.2px;
+    color: rgba(233, 255, 196, 0.94);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 12px;
+}
+
+.sidebar-button {
+    width: 100%;
+    height: 38px;
+    margin-bottom: 7px;
+
+    border-top-left-radius: 13px;
+    border-top-right-radius: 13px;
+    border-bottom-left-radius: 13px;
+    border-bottom-right-radius: 13px;
+
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+
+    border-top-color: rgba(215, 245, 180, 0.16);
+    border-right-color: rgba(215, 245, 180, 0.10);
+    border-bottom-color: rgba(215, 245, 180, 0.05);
+    border-left-color: rgba(215, 245, 180, 0.10);
+
+    background-color: rgba(18, 42, 39, 0.58);
+    color: rgba(235, 247, 225, 0.96);
+
+    font-size: 8px;
+    letter-spacing: 0.3px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+
+    transition-property: background-color, scale, translate, opacity;
+    transition-duration: 0.14s;
+    transition-timing-function: ease-out;
+}
+
+.primary-sidebar-button {
+    height: 42px;
+    background-color: rgba(58, 126, 52, 0.80);
+    border-top-color: rgba(245, 255, 196, 0.24);
+    border-right-color: rgba(226, 255, 158, 0.16);
+    border-bottom-color: rgba(120, 200, 80, 0.10);
+    border-left-color: rgba(120, 200, 80, 0.16);
+}
+
+.back-sidebar-button {
+    margin-bottom: 0;
+    background-color: rgba(34, 58, 66, 0.72);
+    color: rgba(230, 239, 241, 0.96);
+}
+
+.sidebar-spacer {
+    flex-grow: 1;
+}
+
+.sidebar-button:hover {
+    scale: 1.02 1.02;
+    background-color: rgba(26, 55, 50, 0.76);
+}
+
+.primary-sidebar-button:hover {
+    background-color: rgba(72, 148, 58, 0.88);
+}
+
+.back-sidebar-button:hover {
+    background-color: rgba(47, 78, 86, 0.84);
+}
+
+.sidebar-button:active {
+    scale: 0.88 0.88;
+    translate: 0 2px;
+    opacity: 0.82;
+}
+
+.toggle-sidebar-button {
+    width: 44px;
+    height: 96px;
+
+    margin-left: 0;
+
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 18px;
+    border-bottom-right-radius: 18px;
+
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0;
+
+    border-top-color: rgba(235, 255, 182, 0.24);
+    border-right-color: rgba(235, 255, 182, 0.16);
+    border-bottom-color: rgba(235, 255, 182, 0.08);
+
+    background-color: rgba(28, 60, 50, 0.82);
+    color: rgba(244, 255, 230, 0.98);
+
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+
+    transition-property: background-color, scale, translate, opacity;
+    transition-duration: 0.16s;
+    transition-timing-function: ease-out;
+}
+
+.toggle-sidebar-button:hover {
+    scale: 1.04 1.04;
+    background-color: rgba(39, 84, 70, 0.88);
+}
+
+.toggle-sidebar-button:active {
+    scale: 0.86 0.86;
+    translate: 0 2px;
+    opacity: 0.84;
+}
