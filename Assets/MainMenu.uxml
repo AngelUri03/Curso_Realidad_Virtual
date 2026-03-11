@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/MainMenu.uss?fileID=7433441132597879392&amp;guid=4c8c9356c3d858c48bdea60c0f54bed2&amp;type=3#MainMenu" />
+    <ui:VisualElement name="root" class="root">
+        <ui:VisualElement name="bg-base" class="bg-base" />
+        <ui:VisualElement name="bg-portal-aura" class="bg-portal-aura" />
+        <ui:VisualElement name="bg-portal-aura-2" class="bg-portal-aura-2" />
+        <ui:VisualElement name="screen-shell" class="screen-shell">
+            <ui:VisualElement name="main-card" class="main-card">
+                <ui:VisualElement name="hero-block" class="hero-block">
+                    <ui:VisualElement name="hero-image-frame" class="hero-image-frame">
+                        <ui:VisualElement name="hero-image-glow-back" class="hero-image-glow-back" />
+                        <ui:VisualElement name="hero-image-glow-front" class="hero-image-glow-front" />
+                        <ui:VisualElement name="hero-image" class="hero-image" />
+                    </ui:VisualElement>
+                    <ui:Label name="eyebrow" text="AR CHARACTER CUSTOMIZER" class="eyebrow" />
+                    <ui:Label name="app-title" text="Rick Portal Lab" class="title" />
+                    <ui:Label name="app-subtitle" text="Modifica el personaje en realidad aumentada cambiando el color de la bata y agregando accesorios en tiempo real." class="subtitle" />
+                </ui:VisualElement>
+                <ui:Button name="start-ar-button" text="INICIAR EXPERIENCIA" class="start-button" />
+                <ui:Button name="exit-button" text="SALIR" class="exit-button" style="padding-top: 12px;" />
+                <ui:VisualElement name="actions-block" class="actions-block" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
