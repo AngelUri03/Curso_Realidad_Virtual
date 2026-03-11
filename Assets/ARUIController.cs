@@ -12,8 +12,10 @@ public class ARUIController : MonoBehaviour
     [SerializeField] private GameObject portalGun;
     [SerializeField] private GameObject nave;
 
-    [Header("Material de color de Rick")]
-    [SerializeField] private Material colorMaterial;
+    [Header("Materiales de Rick")]
+    [SerializeField] private Material coatMaterial;      // Bata
+    [SerializeField] private Material hairMaterial;      // Cabello
+    [SerializeField] private Material trousersMaterial;  // Pantalón
 
     [Header("Fuente de botones (opcional, TextCore Font Asset)")]
     [SerializeField] private FontAsset buttonFont;
@@ -33,6 +35,9 @@ public class ARUIController : MonoBehaviour
     private Button backButton;
 
     private bool isSidebarExpanded = false;
+
+    // 0 = bata, 1 = cabello, 2 = pantalón
+    private int colorCycleIndex = 0;
 
     private void OnEnable()
     {
@@ -231,14 +236,51 @@ public class ARUIController : MonoBehaviour
     {
         EnsureRickAlwaysVisible();
 
-        if (colorMaterial == null)
+        Color randomColor = GeneratePleasantRandomColor();
+
+        switch (colorCycleIndex)
         {
-            Debug.LogError("No se asignó el material 'Color' en el inspector.");
-            return;
+            case 0:
+                if (coatMaterial != null)
+                {
+                    coatMaterial.color = randomColor;
+                    Debug.Log($"Bata cambiada a: {randomColor}");
+                }
+                else
+                {
+                    Debug.LogError("No se asignó coatMaterial.");
+                }
+                break;
+
+            case 1:
+                if (hairMaterial != null)
+                {
+                    hairMaterial.color = randomColor;
+                    Debug.Log($"Cabello cambiado a: {randomColor}");
+                }
+                else
+                {
+                    Debug.LogError("No se asignó hairMaterial.");
+                }
+                break;
+
+            case 2:
+                if (trousersMaterial != null)
+                {
+                    trousersMaterial.color = randomColor;
+                    Debug.Log($"Pantalón cambiado a: {randomColor}");
+                }
+                else
+                {
+                    Debug.LogError("No se asignó trousersMaterial.");
+                }
+                break;
         }
 
-        Color randomColor = GeneratePleasantRandomColor();
-        colorMaterial.color = randomColor;
+        colorCycleIndex++;
+
+        if (colorCycleIndex > 2)
+            colorCycleIndex = 0;
     }
 
     private Color GeneratePleasantRandomColor()

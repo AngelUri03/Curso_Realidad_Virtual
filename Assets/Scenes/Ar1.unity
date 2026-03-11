@@ -188,8 +188,11 @@ MonoBehaviour:
   morty: {fileID: 1189582030}
   portalGun: {fileID: 1032001401}
   nave: {fileID: 310290005}
-  colorMaterial: {fileID: 2100000, guid: 647cbf699b1275e43be09066cb383087, type: 2}
+  coatMaterial: {fileID: 2100000, guid: 647cbf699b1275e43be09066cb383087, type: 2}
+  hairMaterial: {fileID: 2100000, guid: ff43ddd3bf4f29340ace106cb402f88e, type: 2}
+  trousersMaterial: {fileID: 2100000, guid: abbe3eb1bb762aa48bcb67853b2958b9, type: 2}
   buttonFont: {fileID: 11400000, guid: a931c9d60033e3147b3f6754ec396123, type: 2}
+  previousSceneName: MainMenu
 --- !u!1001 &310290003
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -852,6 +855,16 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 647cbf699b1275e43be09066cb383087, type: 2}
+    - target: {fileID: -3203964077503436929, guid: fe7e6f94131a4d24fb82d7350f4b1e60,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: ff43ddd3bf4f29340ace106cb402f88e, type: 2}
+    - target: {fileID: -3203964077503436929, guid: fe7e6f94131a4d24fb82d7350f4b1e60,
+        type: 3}
+      propertyPath: m_Materials.Array.data[7]
+      value: 
+      objectReference: {fileID: 2100000, guid: abbe3eb1bb762aa48bcb67853b2958b9, type: 2}
     - target: {fileID: 919132149155446097, guid: fe7e6f94131a4d24fb82d7350f4b1e60,
         type: 3}
       propertyPath: m_Name
