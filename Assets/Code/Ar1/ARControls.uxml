@@ -5,9 +5,8 @@
             <ui:VisualElement name="sidebar-track" class="sidebar-track sidebar-collapsed">
                 <ui:VisualElement name="sidebar-panel" class="sidebar-panel">
                     <ui:Label name="sidebar-title" text="CONTROL PANEL" class="sidebar-title" />
-                    <ui:Button name="color-button" text="Cambiar bata" class="sidebar-button primary-sidebar-button" />
-                    <ui:Button name="nave-button" text="Nave" class="sidebar-button" />
-                    <ui:Button name="portalgun-button" text="Portal" class="sidebar-button" />
+                    <ui:Button name="color-button" text="Cambiar color" class="sidebar-button primary-sidebar-button" />
+                    <ui:Button name="extra-button" text="Objeto extra random" class="sidebar-button" />
                     <ui:Button name="morty-button" text="Morty" class="sidebar-button" />
                     <ui:VisualElement name="sidebar-spacer" class="sidebar-spacer" />
                     <ui:Button name="back-button" text="Volver al menú" class="sidebar-button back-sidebar-button" />

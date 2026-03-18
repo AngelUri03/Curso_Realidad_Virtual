@@ -9,8 +9,11 @@ public class ARUIController : MonoBehaviour
     [Header("Modelos")]
     [SerializeField] private GameObject rick;
     [SerializeField] private GameObject morty;
+
+    [Header("Objetos extra")]
+    [SerializeField] private GameObject gun;
     [SerializeField] private GameObject portalGun;
-    [SerializeField] private GameObject nave;
+    [SerializeField] private GameObject robot;
 
     [Header("Materiales de Rick")]
     [SerializeField] private Material coatMaterial;      // Bata
@@ -30,14 +33,19 @@ public class ARUIController : MonoBehaviour
     private Button toggleSidebarButton;
     private Button colorButton;
     private Button mortyButton;
-    private Button portalGunButton;
-    private Button naveButton;
+    private Button extraButton;
     private Button backButton;
 
     private bool isSidebarExpanded = false;
 
     // 0 = bata, 1 = cabello, 2 = pantalón
     private int colorCycleIndex = 0;
+
+    // Índice del extra actualmente activo
+    // -1 significa que ninguno está activo
+    private int currentExtraIndex = -1;
+
+    private GameObject[] extraObjects;
 
     private void OnEnable()
     {
@@ -56,9 +64,10 @@ public class ARUIController : MonoBehaviour
         toggleSidebarButton = root.Q<Button>("toggle-sidebar-button");
         colorButton = root.Q<Button>("color-button");
         mortyButton = root.Q<Button>("morty-button");
-        portalGunButton = root.Q<Button>("portalgun-button");
-        naveButton = root.Q<Button>("nave-button");
+        extraButton = root.Q<Button>("extra-button");
         backButton = root.Q<Button>("back-button");
+
+        extraObjects = new GameObject[] { gun, portalGun, robot };
 
         ApplyButtonFont();
         RegisterButtonAnimations();
@@ -72,11 +81,8 @@ public class ARUIController : MonoBehaviour
         if (mortyButton != null)
             mortyButton.clicked += ToggleMorty;
 
-        if (portalGunButton != null)
-            portalGunButton.clicked += TogglePortalGun;
-
-        if (naveButton != null)
-            naveButton.clicked += ToggleNave;
+        if (extraButton != null)
+            extraButton.clicked += ShowRandomExtraObject;
 
         if (backButton != null)
             backButton.clicked += GoBackToMenu;
@@ -102,11 +108,8 @@ public class ARUIController : MonoBehaviour
         if (mortyButton != null)
             mortyButton.clicked -= ToggleMorty;
 
-        if (portalGunButton != null)
-            portalGunButton.clicked -= TogglePortalGun;
-
-        if (naveButton != null)
-            naveButton.clicked -= ToggleNave;
+        if (extraButton != null)
+            extraButton.clicked -= ShowRandomExtraObject;
 
         if (backButton != null)
             backButton.clicked -= GoBackToMenu;
@@ -128,11 +131,20 @@ public class ARUIController : MonoBehaviour
         if (morty != null)
             morty.SetActive(false);
 
-        if (portalGun != null)
-            portalGun.SetActive(false);
+        HideAllExtraObjects();
+        currentExtraIndex = -1;
+    }
 
-        if (nave != null)
-            nave.SetActive(false);
+    private void HideAllExtraObjects()
+    {
+        if (extraObjects == null)
+            return;
+
+        foreach (GameObject obj in extraObjects)
+        {
+            if (obj != null)
+                obj.SetActive(false);
+        }
     }
 
     private void ApplyButtonFont()
@@ -154,11 +166,8 @@ public class ARUIController : MonoBehaviour
         if (mortyButton != null)
             mortyButton.style.unityFontDefinition = fontDefinition;
 
-        if (portalGunButton != null)
-            portalGunButton.style.unityFontDefinition = fontDefinition;
-
-        if (naveButton != null)
-            naveButton.style.unityFontDefinition = fontDefinition;
+        if (extraButton != null)
+            extraButton.style.unityFontDefinition = fontDefinition;
 
         if (backButton != null)
             backButton.style.unityFontDefinition = fontDefinition;
@@ -169,8 +178,7 @@ public class ARUIController : MonoBehaviour
         RegisterPressAnimation(toggleSidebarButton);
         RegisterPressAnimation(colorButton);
         RegisterPressAnimation(mortyButton);
-        RegisterPressAnimation(portalGunButton);
-        RegisterPressAnimation(naveButton);
+        RegisterPressAnimation(extraButton);
         RegisterPressAnimation(backButton);
     }
 
@@ -298,16 +306,82 @@ public class ARUIController : MonoBehaviour
         EnsureRickAlwaysVisible();
     }
 
-    private void TogglePortalGun()
+    private void ShowRandomExtraObject()
     {
-        ToggleObject(portalGun);
         EnsureRickAlwaysVisible();
+
+        if (extraObjects == null || extraObjects.Length == 0)
+        {
+            Debug.LogError("No hay objetos extra configurados.");
+            return;
+        }
+
+        int validCount = 0;
+        foreach (GameObject obj in extraObjects)
+        {
+            if (obj != null)
+                validCount++;
+        }
+
+        if (validCount == 0)
+        {
+            Debug.LogError("Todos los objetos extra están vacíos en el Inspector.");
+            return;
+        }
+
+        // Apagar el actual si existe
+        if (currentExtraIndex >= 0 &&
+            currentExtraIndex < extraObjects.Length &&
+            extraObjects[currentExtraIndex] != null)
+        {
+            extraObjects[currentExtraIndex].SetActive(false);
+        }
+
+        int nextIndex = GetRandomExtraIndexWithoutRepeat();
+
+        if (nextIndex == -1)
+        {
+            Debug.LogError("No se pudo seleccionar un objeto extra válido.");
+            return;
+        }
+
+        extraObjects[nextIndex].SetActive(true);
+        currentExtraIndex = nextIndex;
+
+        Debug.Log("Objeto extra mostrado: " + extraObjects[nextIndex].name);
     }
 
-    private void ToggleNave()
+    private int GetRandomExtraIndexWithoutRepeat()
     {
-        ToggleObject(nave);
-        EnsureRickAlwaysVisible();
+        if (extraObjects == null || extraObjects.Length == 0)
+            return -1;
+
+        // Guardar índices válidos excepto el actual
+        System.Collections.Generic.List<int> availableIndexes = new System.Collections.Generic.List<int>();
+
+        for (int i = 0; i < extraObjects.Length; i++)
+        {
+            if (extraObjects[i] != null && i != currentExtraIndex)
+            {
+                availableIndexes.Add(i);
+            }
+        }
+
+        // Si no hay otro disponible, regresar el actual solo si existe
+        if (availableIndexes.Count == 0)
+        {
+            if (currentExtraIndex >= 0 &&
+                currentExtraIndex < extraObjects.Length &&
+                extraObjects[currentExtraIndex] != null)
+            {
+                return currentExtraIndex;
+            }
+
+            return -1;
+        }
+
+        int randomListIndex = Random.Range(0, availableIndexes.Count);
+        return availableIndexes[randomListIndex];
     }
 
     private void ToggleObject(GameObject obj)
