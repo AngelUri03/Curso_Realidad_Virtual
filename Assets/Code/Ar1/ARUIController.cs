@@ -1,8 +1,10 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using UnityEngine.TextCore.Text;
+using Vuforia;
 
 public class ARUIController : MonoBehaviour
 {
@@ -10,15 +12,32 @@ public class ARUIController : MonoBehaviour
     [SerializeField] private GameObject rick;
     [SerializeField] private GameObject morty;
 
+    [Header("Animadores")]
+    [SerializeField] private Animator rickAnimator;
+    [SerializeField] private Animator mortyAnimator;
+
+    [Header("Parámetros Animator")]
+    [SerializeField] private string rickWalkParameter = "IsWalking";
+    [SerializeField] private string mortyAnimationStateName = "Slow Run";
+
     [Header("Objetos extra")]
     [SerializeField] private GameObject gun;
     [SerializeField] private GameObject portalGun;
     [SerializeField] private GameObject robot;
 
+    [Header("Movimiento entre marcadores")]
+    [SerializeField] private ObserverBehaviour[] imageTargets;
+    [SerializeField] private float moveSpeed = 0.6f;
+    [SerializeField] private float rotationSpeed = 8f;
+    [SerializeField] private float arriveDistance = 0.01f;
+
+    [Header("Ajuste de orientación de Rick")]
+    [SerializeField] private float rickRotationOffsetY = 0f;
+
     [Header("Materiales de Rick")]
-    [SerializeField] private Material coatMaterial;      // Bata
-    [SerializeField] private Material hairMaterial;      // Cabello
-    [SerializeField] private Material trousersMaterial;  // Pantalón
+    [SerializeField] private Material coatMaterial;
+    [SerializeField] private Material hairMaterial;
+    [SerializeField] private Material trousersMaterial;
 
     [Header("Fuente de botones (opcional, TextCore Font Asset)")]
     [SerializeField] private FontAsset buttonFont;
@@ -34,6 +53,7 @@ public class ARUIController : MonoBehaviour
     private Button colorButton;
     private Button mortyButton;
     private Button extraButton;
+    private Button moveButton;
     private Button backButton;
 
     private bool isSidebarExpanded = false;
@@ -41,11 +61,13 @@ public class ARUIController : MonoBehaviour
     // 0 = bata, 1 = cabello, 2 = pantalón
     private int colorCycleIndex = 0;
 
-    // Índice del extra actualmente activo
-    // -1 significa que ninguno está activo
+    // Índice del extra activo
     private int currentExtraIndex = -1;
-
     private GameObject[] extraObjects;
+
+    // Movimiento
+    private bool isMoving = false;
+    private int currentTargetIndex = -1;
 
     private void OnEnable()
     {
@@ -65,6 +87,7 @@ public class ARUIController : MonoBehaviour
         colorButton = root.Q<Button>("color-button");
         mortyButton = root.Q<Button>("morty-button");
         extraButton = root.Q<Button>("extra-button");
+        moveButton = root.Q<Button>("move-button");
         backButton = root.Q<Button>("back-button");
 
         extraObjects = new GameObject[] { gun, portalGun, robot };
@@ -83,6 +106,9 @@ public class ARUIController : MonoBehaviour
 
         if (extraButton != null)
             extraButton.clicked += ShowRandomExtraObject;
+
+        if (moveButton != null)
+            moveButton.clicked += MoveRickToNextMarker;
 
         if (backButton != null)
             backButton.clicked += GoBackToMenu;
@@ -111,6 +137,9 @@ public class ARUIController : MonoBehaviour
         if (extraButton != null)
             extraButton.clicked -= ShowRandomExtraObject;
 
+        if (moveButton != null)
+            moveButton.clicked -= MoveRickToNextMarker;
+
         if (backButton != null)
             backButton.clicked -= GoBackToMenu;
     }
@@ -133,6 +162,7 @@ public class ARUIController : MonoBehaviour
 
         HideAllExtraObjects();
         currentExtraIndex = -1;
+        SetRickWalking(false);
     }
 
     private void HideAllExtraObjects()
@@ -169,6 +199,9 @@ public class ARUIController : MonoBehaviour
         if (extraButton != null)
             extraButton.style.unityFontDefinition = fontDefinition;
 
+        if (moveButton != null)
+            moveButton.style.unityFontDefinition = fontDefinition;
+
         if (backButton != null)
             backButton.style.unityFontDefinition = fontDefinition;
     }
@@ -179,6 +212,7 @@ public class ARUIController : MonoBehaviour
         RegisterPressAnimation(colorButton);
         RegisterPressAnimation(mortyButton);
         RegisterPressAnimation(extraButton);
+        RegisterPressAnimation(moveButton);
         RegisterPressAnimation(backButton);
     }
 
@@ -250,38 +284,23 @@ public class ARUIController : MonoBehaviour
         {
             case 0:
                 if (coatMaterial != null)
-                {
                     coatMaterial.color = randomColor;
-                    Debug.Log($"Bata cambiada a: {randomColor}");
-                }
                 else
-                {
                     Debug.LogError("No se asignó coatMaterial.");
-                }
                 break;
 
             case 1:
                 if (hairMaterial != null)
-                {
                     hairMaterial.color = randomColor;
-                    Debug.Log($"Cabello cambiado a: {randomColor}");
-                }
                 else
-                {
                     Debug.LogError("No se asignó hairMaterial.");
-                }
                 break;
 
             case 2:
                 if (trousersMaterial != null)
-                {
                     trousersMaterial.color = randomColor;
-                    Debug.Log($"Pantalón cambiado a: {randomColor}");
-                }
                 else
-                {
                     Debug.LogError("No se asignó trousersMaterial.");
-                }
                 break;
         }
 
@@ -302,7 +321,31 @@ public class ARUIController : MonoBehaviour
 
     private void ToggleMorty()
     {
-        ToggleObject(morty);
+        if (morty == null)
+        {
+            Debug.LogError("Morty no está asignado.");
+            return;
+        }
+
+        bool newState = !morty.activeSelf;
+        morty.SetActive(newState);
+
+        if (newState)
+        {
+            Animator animator = mortyAnimator != null ? mortyAnimator : morty.GetComponent<Animator>();
+
+            if (animator != null)
+            {
+                animator.Rebind();
+                animator.Update(0f);
+                animator.Play(mortyAnimationStateName, 0, 0f);
+            }
+            else
+            {
+                Debug.LogWarning("Morty no tiene Animator.");
+            }
+        }
+
         EnsureRickAlwaysVisible();
     }
 
@@ -329,7 +372,6 @@ public class ARUIController : MonoBehaviour
             return;
         }
 
-        // Apagar el actual si existe
         if (currentExtraIndex >= 0 &&
             currentExtraIndex < extraObjects.Length &&
             extraObjects[currentExtraIndex] != null)
@@ -348,7 +390,8 @@ public class ARUIController : MonoBehaviour
         extraObjects[nextIndex].SetActive(true);
         currentExtraIndex = nextIndex;
 
-        Debug.Log("Objeto extra mostrado: " + extraObjects[nextIndex].name);
+        if (extraButton != null)
+            extraButton.text = "Extra: " + extraObjects[nextIndex].name;
     }
 
     private int GetRandomExtraIndexWithoutRepeat()
@@ -356,18 +399,14 @@ public class ARUIController : MonoBehaviour
         if (extraObjects == null || extraObjects.Length == 0)
             return -1;
 
-        // Guardar índices válidos excepto el actual
-        System.Collections.Generic.List<int> availableIndexes = new System.Collections.Generic.List<int>();
+        List<int> availableIndexes = new List<int>();
 
         for (int i = 0; i < extraObjects.Length; i++)
         {
             if (extraObjects[i] != null && i != currentExtraIndex)
-            {
                 availableIndexes.Add(i);
-            }
         }
 
-        // Si no hay otro disponible, regresar el actual solo si existe
         if (availableIndexes.Count == 0)
         {
             if (currentExtraIndex >= 0 &&
@@ -382,6 +421,142 @@ public class ARUIController : MonoBehaviour
 
         int randomListIndex = Random.Range(0, availableIndexes.Count);
         return availableIndexes[randomListIndex];
+    }
+
+    private void MoveRickToNextMarker()
+    {
+        EnsureRickAlwaysVisible();
+
+        if (isMoving)
+            return;
+
+        if (rick == null)
+        {
+            Debug.LogError("Rick no está asignado.");
+            return;
+        }
+
+        StartCoroutine(MoveRickCoroutine());
+    }
+
+    private IEnumerator MoveRickCoroutine()
+    {
+        isMoving = true;
+
+        ObserverBehaviour target = GetNextDetectedTarget();
+
+        if (target == null)
+        {
+            Debug.LogWarning("No hay marcadores detectados para mover a Rick.");
+            SetRickWalking(false);
+            isMoving = false;
+            yield break;
+        }
+
+        Vector3 endPosition = target.transform.position;
+        endPosition.y = rick.transform.position.y;
+
+        Vector3 direction = endPosition - rick.transform.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.0001f)
+        {
+            SetRickWalking(false);
+            isMoving = false;
+            yield break;
+        }
+
+        yield return StartCoroutine(RotateRickTowards(endPosition));
+
+        SetRickWalking(true);
+
+        while (Vector3.Distance(rick.transform.position, endPosition) > arriveDistance)
+        {
+            Vector3 moveDirection = endPosition - rick.transform.position;
+            moveDirection.y = 0f;
+
+            if (moveDirection.sqrMagnitude > 0.0001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(moveDirection.normalized, Vector3.up);
+                targetRotation *= Quaternion.Euler(0f, rickRotationOffsetY, 0f);
+
+                rick.transform.rotation = Quaternion.Slerp(
+                    rick.transform.rotation,
+                    targetRotation,
+                    Time.deltaTime * rotationSpeed
+                );
+            }
+
+            rick.transform.position = Vector3.MoveTowards(
+                rick.transform.position,
+                endPosition,
+                moveSpeed * Time.deltaTime
+            );
+
+            yield return null;
+        }
+
+        rick.transform.position = endPosition;
+        SetRickWalking(false);
+        isMoving = false;
+    }
+
+    private IEnumerator RotateRickTowards(Vector3 targetPosition)
+    {
+        if (rick == null)
+            yield break;
+
+        Vector3 direction = targetPosition - rick.transform.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.0001f)
+            yield break;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+        targetRotation *= Quaternion.Euler(0f, rickRotationOffsetY, 0f);
+
+        while (Quaternion.Angle(rick.transform.rotation, targetRotation) > 1f)
+        {
+            rick.transform.rotation = Quaternion.Slerp(
+                rick.transform.rotation,
+                targetRotation,
+                Time.deltaTime * rotationSpeed
+            );
+
+            yield return null;
+        }
+
+        rick.transform.rotation = targetRotation;
+    }
+
+    private void SetRickWalking(bool walking)
+    {
+        if (rickAnimator != null)
+            rickAnimator.SetBool(rickWalkParameter, walking);
+    }
+
+    private ObserverBehaviour GetNextDetectedTarget()
+    {
+        if (imageTargets == null || imageTargets.Length == 0)
+            return null;
+
+        int totalTargets = imageTargets.Length;
+
+        for (int i = 1; i <= totalTargets; i++)
+        {
+            int index = (currentTargetIndex + i) % totalTargets;
+            ObserverBehaviour target = imageTargets[index];
+
+            if (target != null &&
+                (target.TargetStatus.Status == Status.TRACKED ||
+                 target.TargetStatus.Status == Status.EXTENDED_TRACKED))
+            {
+                currentTargetIndex = index;
+                return target;
+            }
+        }
+
+        return null;
     }
 
     private void ToggleObject(GameObject obj)

@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/ARControls.uss?fileID=7433441132597879392&amp;guid=3a5423c4327d6464aaeb5e3c4bf02052&amp;type=3#ARControls" />
+    <Style src="project://database/Assets/Code/Ar1/ARControls.uss?fileID=7433441132597879392&amp;guid=3a5423c4327d6464aaeb5e3c4bf02052&amp;type=3#ARControls" />
     <ui:VisualElement name="ar-root" class="ar-root">
         <ui:VisualElement name="sidebar-host" class="sidebar-host">
             <ui:VisualElement name="sidebar-track" class="sidebar-track sidebar-collapsed">
@@ -9,9 +9,10 @@
                     <ui:Button name="extra-button" text="Objeto extra random" class="sidebar-button" />
                     <ui:Button name="morty-button" text="Morty" class="sidebar-button" />
                     <ui:VisualElement name="sidebar-spacer" class="sidebar-spacer" />
+                    <ui:Button name="move-button" text="Mover a marcador" class="sidebar-button move-sidebar-button" />
                     <ui:Button name="back-button" text="Volver al menú" class="sidebar-button back-sidebar-button" />
                 </ui:VisualElement>
-                <ui:Button name="toggle-sidebar-button" text=">" class="toggle-sidebar-button" />
+                <ui:Button name="toggle-sidebar-button" text="&gt;" class="toggle-sidebar-button" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
